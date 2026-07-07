@@ -79,6 +79,9 @@
         <a href="{{ route('admin.layanan') }}" class="nav-link {{ request()->routeIs('admin.layanan*') ? 'active' : '' }}">
             <i class="bi bi-scissors"></i> Manajemen Layanan
         </a>
+        <a href="{{ route('admin.kapster') }}" class="nav-link {{ request()->routeIs('admin.kapster*') ? 'active' : '' }}">
+            <i class="bi bi-person-badge"></i> Manajemen Barber
+        </a>
         <a href="{{ route('admin.users') }}" class="nav-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
             <i class="bi bi-people"></i> Manajemen User
         </a>
@@ -108,24 +111,36 @@
 </div>
 
 <main class="admin-main">
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
+
 
     @yield('content')
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        background: '#1a1a1a',
+        color: '#f0f0f0',
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    @if(session('success'))
+        Toast.fire({ icon: 'success', title: '{{ session('success') }}' });
+    @endif
+
+    @if(session('error'))
+        Toast.fire({ icon: 'error', title: '{{ session('error') }}' });
+    @endif
+</script>
 @stack('scripts')
 </body>
 </html>

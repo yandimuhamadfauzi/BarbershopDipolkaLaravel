@@ -25,6 +25,10 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email') }}" required placeholder="email@example.com">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Nomor WhatsApp</label>
+                            <input type="text" name="no_wa" class="form-control" value="{{ old('no_wa') }}" required placeholder="081234567890" minlength="10" maxlength="15">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" required placeholder="Min. 6 karakter">
                         </div>

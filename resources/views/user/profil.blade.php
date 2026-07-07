@@ -231,14 +231,24 @@
                 </div>
                 <div style="width:90px;text-align:center;flex-shrink:0">
                     <span class="sbadge sb-{{ $st }}">{{ $a->status }}</span>
+                    @if(isset($a->payment_status))
+                        @if($a->payment_status === 'pending')
+                            <div style="margin-top: 4px;"><span class="badge bg-warning text-dark" style="font-size:0.6rem;">Belum Bayar</span></div>
+                        @elseif($a->payment_status === 'paid')
+                            <div style="margin-top: 4px;"><span class="badge bg-success" style="font-size:0.6rem;">Lunas</span></div>
+                        @endif
+                    @endif
                 </div>
-                <div style="width:60px;text-align:right;flex-shrink:0">
+                <div style="width:80px;text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-items:end;">
+                    @if(isset($a->payment_status) && $a->payment_status === 'pending' && $a->snap_token)
+                        <button type="button" class="btn btn-sm btn-outline-warning" style="font-size:.7rem;padding:2px 10px;border-radius:20px;color:var(--gold);border-color:var(--gold-border);" onclick="payWithMidtrans('{{ $a->snap_token }}')">Bayar</button>
+                    @endif
                     @if($a->status === 'Menunggu')
                     <form action="{{ route('user.batal', $a->id) }}" method="POST" onsubmit="return confirm('Batalkan booking #{{ $a->nomor_antrian }}?')">
                         @csrf
-                        <button type="submit" class="btn-batal">Batal</button>
+                        <button type="submit" class="btn-batal" style="width:100%">Batal</button>
                     </form>
-                    @else
+                    @elseif(!isset($a->payment_status) || $a->payment_status !== 'pending')
                     <span style="color:var(--muted2);font-size:.8rem">—</span>
                     @endif
                 </div>
@@ -290,10 +300,16 @@
                         <small style="color:var(--muted);font-size:.72rem">Minimal 6 karakter jika ingin mengganti.</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-gold rounded-pill px-4 fw-bold">💾 Simpan Perubahan</button>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-3" onclick="if(confirm('Apakah Anda yakin ingin menghapus akun Anda secara permanen? Semua riwayat booking juga akan ikut terhapus dan tindakan ini tidak dapat dibatalkan.')) document.getElementById('formHapusAkun').submit();">🗑️ Hapus Akun</button>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-gold rounded-pill px-4 fw-bold">💾 Simpan Perubahan</button>
+                    </div>
                 </div>
+            </form>
+            <form id="formHapusAkun" action="{{ route('user.hapus') }}" method="POST" style="display: none;">
+                @csrf
             </form>
         </div>
     </div>
@@ -312,6 +328,37 @@ function previewFoto(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+function payWithMidtrans(snapToken) {
+    if (typeof snap === 'undefined') {
+        alert('Midtrans Snap tidak dimuat. Harap periksa koneksi atau konfigurasi.');
+        return;
+    }
+    snap.pay(snapToken, {
+        onSuccess: function(result){
+            Toast.fire({ icon: 'success', title: 'Pembayaran berhasil!' });
+            setTimeout(() => location.reload(), 1500);
+        },
+        onPending: function(result){
+            Toast.fire({ icon: 'info', title: 'Menunggu pembayaran.' });
+        },
+        onError: function(result){
+            Toast.fire({ icon: 'error', title: 'Pembayaran gagal!' });
+        },
+        onClose: function(){
+            Toast.fire({ icon: 'warning', title: 'Anda menutup popup tanpa menyelesaikan pembayaran.' });
+        }
+    });
+}
+
+@if(session('snap_token'))
+    document.addEventListener('DOMContentLoaded', function() {
+        // Beri sedikit jeda agar script snap.js ter-load sempurna
+        setTimeout(() => {
+            payWithMidtrans('{{ session("snap_token") }}');
+        }, 500);
+    });
+@endif
+
 setTimeout(() => location.reload(), 30000);
 </script>
 @endpush

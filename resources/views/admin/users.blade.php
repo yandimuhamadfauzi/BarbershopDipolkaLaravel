@@ -86,8 +86,15 @@
                     <div class="d-flex align-items-center gap-2">
                         <img src="{{ $u->foto_url }}" width="38" height="38" class="rounded-circle" style="object-fit:cover;border:1.5px solid #2a2a2a">
                         <div>
-                            <div class="fw-semibold text-white">{{ $u->nama }}</div>
-                            <small class="text-muted">{{ $u->email }}</small>
+                            <div class="fw-semibold text-white">
+                                {{ $u->nama }}
+                                @if($u->is_blocked) <span class="badge bg-danger ms-1" style="font-size:0.6rem">⛔ DIBLOKIR</span> @endif
+                                @if($u->hasPenalti()) <span class="badge bg-warning text-dark ms-1" style="font-size:0.6rem">⚠ DITANGGUHKAN</span> @endif
+                            </div>
+                            <small class="text-muted d-block" style="line-height:1.2">{{ $u->email }}</small>
+                            @if($u->no_wa)
+                            <small class="text-gold" style="font-size:0.75rem"><i class="bi bi-whatsapp"></i> {{ $u->no_wa }}</small>
+                            @endif
                         </div>
                     </div>
                 </td>
@@ -109,6 +116,22 @@
                 </td>
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-1">
+                        <form action="{{ route('admin.users.toggleBlock', $u->id) }}" method="POST"
+                              onsubmit="return confirm('{{ $u->is_blocked ? 'Buka blokir' : 'Blokir' }} user {{ $u->nama }}?')" class="d-inline">
+                            @csrf
+                            <button class="btn btn-outline-{{ $u->is_blocked ? 'success' : 'warning' }} btn-sm rounded-pill px-2" title="{{ $u->is_blocked ? 'Buka Blokir' : 'Blokir' }}">
+                                {{ $u->is_blocked ? '✅ Buka Blokir' : '⛔ Blokir' }}
+                            </button>
+                        </form>
+                        @if($u->hasPenalti())
+                        <form action="{{ route('admin.users.hapusPenalti', $u->id) }}" method="POST"
+                              onsubmit="return confirm('Cabut status ditangguhkan dari user {{ $u->nama }}?')" class="d-inline">
+                            @csrf
+                            <button class="btn btn-outline-success btn-sm rounded-pill px-2" title="Cabut Status Ditangguhkan">
+                                🔓 Buka Tangguhan
+                            </button>
+                        </form>
+                        @endif
                         <button class="btn btn-outline-info btn-sm rounded-pill px-2"
                                 data-bs-toggle="modal" data-bs-target="#resetPassModal"
                                 data-id="{{ $u->id }}" data-nama="{{ $u->nama }}"

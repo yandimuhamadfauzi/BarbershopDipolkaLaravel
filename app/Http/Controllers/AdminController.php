@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Antrian;
+use App\Models\Kapster;
 use App\Models\Layanan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -71,12 +72,14 @@ class AdminController extends Controller
         $request->validate([
             'nama_layanan' => 'required|string|max:100',
             'harga'        => 'required|integer|min:1000',
+            'durasi_menit' => 'required|integer|min:5',
         ]);
 
         $data = [
             'nama_layanan' => $request->nama_layanan,
             'emoji'        => $request->emoji ?: '✂️',
             'harga'        => $request->harga,
+            'durasi_menit' => $request->durasi_menit,
             'deskripsi'    => $request->deskripsi,
             'aktif'        => $request->has('aktif'),
         ];
@@ -144,6 +147,58 @@ class AdminController extends Controller
         $request->validate(['pass_baru' => 'required|min:6']);
         User::findOrFail($id)->update(['password' => Hash::make($request->pass_baru)]);
         return redirect()->route('admin.users')->with('success','Password user berhasil direset!');
+    }
+
+    public function toggleBlockUser($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->is_admin) return redirect()->route('admin.users')->with('error','Tidak dapat memblokir admin.');
+        $user->update(['is_blocked' => !$user->is_blocked]);
+        $status = $user->is_blocked ? 'diblokir' : 'dibuka blokirnya';
+        return redirect()->route('admin.users')->with('success', "Akun user berhasil $status.");
+    }
+
+    public function hapusPenalti($id)
+    {
+        $user = User::findOrFail($id);
+        $user->antrian()->where('status', 'Batal')->update(['is_penalti_cleared' => true]);
+        return redirect()->route('admin.users')->with('success','Status ditangguhkan user berhasil dicabut!');
+    }
+
+    // ── KAPSTER ──────────────────────────────────────────────────
+    public function kapster()
+    {
+        $kapsters = Kapster::orderByDesc('aktif')->orderBy('nama')->get();
+        return view('admin.kapster', compact('kapsters'));
+    }
+
+    public function simpanKapster(Request $request)
+    {
+        $request->validate(['nama' => 'required|string|max:100']);
+        if ($request->id_kapster) {
+            Kapster::findOrFail($request->id_kapster)->update(['nama' => $request->nama, 'aktif' => $request->has('aktif')]);
+            $msg = 'Kapster berhasil diperbarui!';
+        } else {
+            Kapster::create(['nama' => $request->nama, 'aktif' => $request->has('aktif')]);
+            $msg = 'Kapster baru berhasil ditambahkan!';
+        }
+        return redirect()->route('admin.kapster')->with('success', $msg);
+    }
+
+    public function hapusKapster($id)
+    {
+        $kapster = Kapster::findOrFail($id);
+        $ada = Antrian::where('kapster_id', $id)->whereIn('status', ['Menunggu', 'Dipanggil'])->exists();
+        if ($ada) return redirect()->route('admin.kapster')->with('error','Tidak bisa menghapus kapster yang memiliki antrian aktif!');
+        $kapster->delete();
+        return redirect()->route('admin.kapster')->with('success','Kapster berhasil dihapus.');
+    }
+
+    public function toggleKapster($id)
+    {
+        $k = Kapster::findOrFail($id);
+        $k->update(['aktif' => !$k->aktif]);
+        return redirect()->route('admin.kapster')->with('success','Status kapster diperbarui.');
     }
 
     // ── LAPORAN ──────────────────────────────────────────────────

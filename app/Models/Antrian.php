@@ -11,6 +11,7 @@ class Antrian extends Model
 
     protected $fillable = [
         'user_id',
+        'kapster_id',
         'nama',
         'layanan',
         'harga',
@@ -18,6 +19,7 @@ class Antrian extends Model
         'status',
         'tanggal_booking',
         'jam_booking',
+        'waktu_selesai',
         'notif',
     ];
 
@@ -31,6 +33,11 @@ class Antrian extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function kapster(): BelongsTo
+    {
+        return $this->belongsTo(Kapster::class, 'kapster_id');
     }
 
     public function getHargaFormatAttribute(): string

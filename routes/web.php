@@ -4,7 +4,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PaymentCallbackController;
 use Illuminate\Support\Facades\Route;
+
+// MIDTRANS WEBHOOK
+Route::post('/midtrans/callback', [PaymentCallbackController::class, 'receive']);
 
 // PUBLIC
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -25,6 +29,7 @@ Route::post('/booking', [HomeController::class, 'booking'])->name('booking')->mi
 Route::middleware('auth')->prefix('profil')->name('user.')->group(function () {
     Route::get('/',             [UserController::class, 'profil'])->name('profil');
     Route::post('/update',      [UserController::class, 'updateProfil'])->name('update');
+    Route::post('/hapus',       [UserController::class, 'hapusAkun'])->name('hapus');
     Route::post('/batal/{id}',  [UserController::class, 'batalAntrian'])->name('batal');
     Route::post('/clear-notif', [UserController::class, 'clearNotif'])->name('clearNotif');
     Route::get('/cek-notif',    [UserController::class, 'cekNotif'])->name('cekNotif');
@@ -46,9 +51,16 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::delete('/layanan/{id}',         [AdminController::class, 'hapusLayanan'])->name('layanan.hapus');
     Route::get('/layanan/toggle/{id}',     [AdminController::class, 'toggleLayanan'])->name('layanan.toggle');
 
+    Route::get('/kapster',                 [AdminController::class, 'kapster'])->name('kapster');
+    Route::post('/kapster',                [AdminController::class, 'simpanKapster'])->name('kapster.simpan');
+    Route::delete('/kapster/{id}',         [AdminController::class, 'hapusKapster'])->name('kapster.hapus');
+    Route::get('/kapster/toggle/{id}',     [AdminController::class, 'toggleKapster'])->name('kapster.toggle');
+
     Route::get('/users',                   [AdminController::class, 'users'])->name('users');
     Route::delete('/users/{id}',           [AdminController::class, 'hapusUser'])->name('users.hapus');
     Route::post('/users/{id}/reset-pass',  [AdminController::class, 'resetPassword'])->name('users.resetPass');
+    Route::post('/users/{id}/toggle-block',[AdminController::class, 'toggleBlockUser'])->name('users.toggleBlock');
+    Route::post('/users/{id}/hapus-penalti',[AdminController::class, 'hapusPenalti'])->name('users.hapusPenalti');
 
     Route::get('/laporan',                 [AdminController::class, 'laporan'])->name('laporan');
 });

@@ -39,7 +39,10 @@
                     <span style="font-size:1.5rem;width:36px;text-align:center">{{ $svc->emoji }}</span>
                     <div class="flex-grow-1">
                         <h6 class="mb-0 fw-bold text-white">{{ $svc->nama_layanan }}</h6>
-                        <small class="text-muted">{{ $svc->deskripsi }}</small>
+                        <small class="text-muted">
+                            @if($svc->deskripsi){{ $svc->deskripsi }} <span class="mx-1">·</span> @endif
+                            ⏱️ {{ $svc->durasi_menit }} Menit
+                        </small>
                     </div>
                     <span class="fw-bold text-gold fs-5 ms-3 text-nowrap">{{ $svc->harga_format }}</span>
                 </div>
@@ -106,6 +109,15 @@
                             <option value="" disabled selected>— Pilih Layanan —</option>
                             @foreach($layanan as $svc)
                             <option value="{{ $svc->nama_layanan }}">{{ $svc->emoji }} {{ $svc->nama_layanan }} — {{ $svc->harga_format }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Barber (Tukang Cukur)</label>
+                        <select name="kapster" id="selectKapster" class="form-select" required>
+                            <option value="" disabled selected>— Pilih Barber —</option>
+                            @foreach($kapsters as $k)
+                            <option value="{{ $k->id }}">🧑‍💼 {{ $k->nama }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -189,6 +201,11 @@
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" name="email" class="form-control" placeholder="nama@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nomor WhatsApp</label>
+                        <input type="text" name="no_wa" class="form-control" placeholder="081234567890" minlength="10" maxlength="15" required>
+                        <small class="text-muted" style="font-size:0.75rem;">Diperlukan untuk konfirmasi booking.</small>
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Password <small class="text-muted">(min. 6 karakter)</small></label>

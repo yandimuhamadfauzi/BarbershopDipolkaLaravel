@@ -10,6 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/barbershop.css') }}">
     @stack('styles')
+    @if(config('midtrans.is_production'))
+        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    @else
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    @endif
 </head>
 <body>
 
@@ -55,18 +60,7 @@
     </div>
 </nav>
 
-@if(session('success'))
-<div class="alert alert-success alert-dismissible fade show fixed-top mt-5 mx-3 shadow" role="alert" style="z-index:2000;max-width:500px;margin-left:auto!important;">
-    <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
-@if(session('error'))
-<div class="alert alert-danger alert-dismissible fade show fixed-top mt-5 mx-3 shadow" role="alert" style="z-index:2000;max-width:500px;margin-left:auto!important;">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
+
 
 @yield('content')
 
@@ -77,15 +71,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@stack('scripts')
 <script>
-    // Auto-dismiss alerts after 4 seconds
-    setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(el => {
-            let alert = bootstrap.Alert.getOrCreateInstance(el);
-            alert.close();
-        });
-    }, 4000);
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        background: '#1a1a1a',
+        color: '#f0f0f0',
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    @if(session('success'))
+        Toast.fire({ icon: 'success', title: '{{ session('success') }}' });
+    @endif
+
+    @if(session('error'))
+        Toast.fire({ icon: 'error', title: '{{ session('error') }}' });
+    @endif
 </script>
+@stack('scripts')
 </body>
 </html>

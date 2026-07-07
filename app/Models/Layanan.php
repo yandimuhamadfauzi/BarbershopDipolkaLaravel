@@ -12,6 +12,7 @@ class Layanan extends Model
         'nama_layanan',
         'emoji',
         'harga',
+        'durasi_menit',
         'deskripsi',
         'aktif',
     ];
@@ -19,6 +20,7 @@ class Layanan extends Model
     protected $casts = [
         'aktif' => 'boolean',
         'harga' => 'integer',
+        'durasi_menit' => 'integer',
     ];
 
     public function scopeAktif($query)

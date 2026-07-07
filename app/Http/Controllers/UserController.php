@@ -64,6 +64,26 @@ class UserController extends Controller
         return redirect()->route('user.profil')->with('success', 'Profil berhasil diperbarui!');
     }
 
+    public function hapusAkun(Request $request)
+    {
+        $user = Auth::user();
+
+        // Optional: you can delete their avatar file if it exists
+        if ($user->foto && file_exists(public_path('img/profil/' . $user->foto))) {
+            unlink(public_path('img/profil/' . $user->foto));
+        }
+
+        // Delete user's queues and user account
+        Antrian::where('user_id', $user->id)->delete();
+        $user->delete();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('success', 'Akun Anda telah berhasil dihapus secara permanen.');
+    }
+
     public function batalAntrian(Request $request, $id)
     {
         $user = Auth::user();

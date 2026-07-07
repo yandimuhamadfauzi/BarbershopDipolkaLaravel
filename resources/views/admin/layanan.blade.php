@@ -46,6 +46,10 @@
                     <input type="number" name="harga" id="harga_input" class="form-control" placeholder="25000" min="1000" step="500" required>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Durasi (Menit) <span class="text-danger">*</span></label>
+                    <input type="number" name="durasi_menit" id="durasi_menit" class="form-control" placeholder="30" value="30" min="5" step="5" required>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Deskripsi Singkat</label>
                     <input type="text" name="deskripsi" id="deskripsi" class="form-control" placeholder="Penjelasan singkat layanan">
                 </div>
@@ -77,6 +81,7 @@
                     <thead>
                         <tr>
                             <th>Layanan</th>
+                            <th class="text-center">Durasi</th>
                             <th class="text-end">Harga</th>
                             <th class="text-center">Status</th>
                             <th class="text-center" style="width:140px">Aksi</th>
@@ -94,6 +99,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="text-center text-muted">{{ $l->durasi_menit }} Menit</td>
                         <td class="text-end text-gold fw-bold">{{ $l->harga_format }}</td>
                         <td class="text-center">
                             <a href="{{ route('admin.layanan.toggle', $l->id) }}"
@@ -104,7 +110,7 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-1">
                                 <button class="btn btn-outline-warning btn-sm rounded-pill px-2"
-                                        onclick="editLayanan({{ $l->id }}, '{{ addslashes($l->nama_layanan) }}', '{{ $l->emoji }}', {{ $l->harga }}, '{{ addslashes($l->deskripsi ?? '') }}', {{ $l->aktif ? 1 : 0 }})"
+                                        onclick="editLayanan({{ $l->id }}, '{{ addslashes($l->nama_layanan) }}', '{{ $l->emoji }}', {{ $l->harga }}, {{ $l->durasi_menit ?? 30 }}, '{{ addslashes($l->deskripsi ?? '') }}', {{ $l->aktif ? 1 : 0 }})"
                                         title="Edit">✏️</button>
                                 <form action="{{ route('admin.layanan.hapus', $l->id) }}" method="POST"
                                       onsubmit="return confirm('Hapus layanan {{ $l->nama_layanan }}?')" class="d-inline">
@@ -131,11 +137,12 @@
 
 @push('scripts')
 <script>
-function editLayanan(id, nama, emoji, harga, deskripsi, aktif) {
+function editLayanan(id, nama, emoji, harga, durasi, deskripsi, aktif) {
     document.getElementById('id_layanan').value  = id;
     document.getElementById('emoji').value        = emoji;
     document.getElementById('nama_layanan').value = nama;
     document.getElementById('harga_input').value  = harga;
+    document.getElementById('durasi_menit').value = durasi;
     document.getElementById('deskripsi').value    = deskripsi;
     document.getElementById('aktif').checked      = aktif == 1;
     document.getElementById('formTitle').textContent = '✏️ Edit Layanan';
@@ -146,6 +153,7 @@ function resetForm() {
     document.getElementById('emoji').value        = '✂️';
     document.getElementById('nama_layanan').value = '';
     document.getElementById('harga_input').value  = '';
+    document.getElementById('durasi_menit').value = '30';
     document.getElementById('deskripsi').value    = '';
     document.getElementById('aktif').checked      = true;
     document.getElementById('formTitle').textContent = '➕ Tambah Layanan Baru';

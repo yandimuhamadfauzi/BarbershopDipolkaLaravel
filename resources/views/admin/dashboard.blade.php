@@ -119,13 +119,26 @@
                 <td style="color:#aaa;font-size:.85rem">{{ $a->layanan }}</td>
                 <td style="color:#aaa;font-size:.85rem">{{ $a->harga_format }}</td>
                 <td style="color:#f0f0f0;font-weight:600">{{ substr($a->jam_booking,0,5) }}</td>
-                <td><span class="badge {{ $sc }} rounded-pill">{{ $a->status }}</span></td>
+                <td>
+                    <span class="badge {{ $sc }} rounded-pill">{{ $a->status }}</span>
+                    @if(isset($a->payment_status))
+                        @if($a->payment_status === 'pending')
+                            <div style="margin-top: 4px;"><span class="badge bg-warning text-dark" style="font-size:0.65rem;">Belum Bayar</span></div>
+                        @elseif($a->payment_status === 'paid')
+                            <div style="margin-top: 4px;"><span class="badge bg-success" style="font-size:0.65rem;">Lunas</span></div>
+                        @endif
+                    @endif
+                </td>
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-1 flex-wrap">
                         @if($a->status === 'Menunggu')
                         <form action="{{ route('admin.panggil', $a->id) }}" method="POST">
                             @csrf<input type="hidden" name="tgl" value="{{ $filterTgl }}">
+                            @if(isset($a->payment_status) && $a->payment_status === 'pending')
+                            <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" onclick="alert('Pelanggan belum membayar antrian ini!')">⏳ Panggil</button>
+                            @else
                             <button class="btn btn-success btn-sm rounded-pill px-3">✅ Panggil</button>
+                            @endif
                         </form>
                         <form action="{{ route('admin.batalAntrian', $a->id) }}" method="POST"
                               onsubmit="return confirm('Batalkan antrian #{{ $a->nomor_antrian }}?')">
