@@ -202,11 +202,6 @@
                         <label class="form-label">Email</label>
                         <input type="email" name="email" class="form-control" placeholder="nama@email.com" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nomor WhatsApp</label>
-                        <input type="text" name="no_wa" class="form-control" placeholder="081234567890" minlength="10" maxlength="15" required>
-                        <small class="text-muted" style="font-size:0.75rem;">Diperlukan untuk konfirmasi booking.</small>
-                    </div>
                     <div class="mb-4">
                         <label class="form-label">Password <small class="text-muted">(min. 6 karakter)</small></label>
                         <input type="password" name="password" class="form-control" placeholder="••••••••" minlength="6" required>

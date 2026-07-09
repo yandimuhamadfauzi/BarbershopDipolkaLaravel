@@ -92,9 +92,6 @@
                                 @if($u->hasPenalti()) <span class="badge bg-warning text-dark ms-1" style="font-size:0.6rem">⚠ DITANGGUHKAN</span> @endif
                             </div>
                             <small class="text-muted d-block" style="line-height:1.2">{{ $u->email }}</small>
-                            @if($u->no_wa)
-                            <small class="text-gold" style="font-size:0.75rem"><i class="bi bi-whatsapp"></i> {{ $u->no_wa }}</small>
-                            @endif
                         </div>
                     </div>
                 </td>

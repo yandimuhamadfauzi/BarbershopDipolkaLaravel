@@ -11,7 +11,6 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
-        'no_wa',
         'foto',
         'is_admin',
         'is_blocked',

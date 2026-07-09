@@ -51,13 +51,10 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama'     => 'required|string|max:100',
-            'no_wa'    => 'required|string|min:10|max:15',
             'email'    => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', Password::min(6)],
         ], [
             'nama.required'      => 'Nama wajib diisi.',
-            'no_wa.required'     => 'Nomor WhatsApp wajib diisi.',
-            'no_wa.min'          => 'Nomor WhatsApp minimal 10 angka.',
             'email.required'     => 'Email wajib diisi.',
             'email.unique'       => 'Email sudah terdaftar.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -66,7 +63,6 @@ class AuthController extends Controller
 
         $user = User::create([
             'nama'     => $request->nama,
-            'no_wa'    => $request->no_wa,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
