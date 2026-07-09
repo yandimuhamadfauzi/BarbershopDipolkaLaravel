@@ -21,6 +21,8 @@ class Antrian extends Model
         'jam_booking',
         'waktu_selesai',
         'notif',
+        'payment_status',
+        'snap_token',
     ];
 
     protected $casts = [
