@@ -10,9 +10,30 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    public function profil()
+    public function profil(Request $request)
     {
         $user = Auth::user();
+
+        // Fallback untuk localhost: Ambil status dari query parameter redirect/fetch Midtrans JS
+        if ($request->has('order_id') && $request->has('transaction_status')) {
+            $order_id = $request->query('order_id');
+            $transaction_status = $request->query('transaction_status');
+            
+            $order_parts = explode('-', $order_id);
+            if (count($order_parts) === 2 && $order_parts[0] === 'ANTRIAN') {
+                $antrian_id = $order_parts[1];
+                $antrian_check = Antrian::find($antrian_id);
+                if ($antrian_check && $antrian_check->user_id == $user->id && $antrian_check->payment_status !== 'paid') {
+                    if (in_array($transaction_status, ['capture', 'settlement'])) {
+                        $antrian_check->update(['payment_status' => 'paid']);
+                    } else if (in_array($transaction_status, ['deny', 'cancel', 'expire'])) {
+                        $antrian_check->update(['payment_status' => 'failed', 'status' => 'Batal']);
+                    }
+                }
+            }
+            return redirect()->route('user.profil')->with('success', 'Pembayaran berhasil dikonfirmasi.');
+        }
+
         $antrian = Antrian::where('user_id', $user->id)
             ->orderByDesc('tanggal_booking')
             ->orderByDesc('jam_booking')

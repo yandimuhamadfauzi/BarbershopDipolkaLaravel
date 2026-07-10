@@ -127,6 +127,9 @@ class HomeController extends Controller
                 'expiry_duration' => 15,
                 'unit' => 'minute',
             ],
+            'callbacks' => [
+                'finish' => route('user.profil'),
+            ],
         ];
 
         try {

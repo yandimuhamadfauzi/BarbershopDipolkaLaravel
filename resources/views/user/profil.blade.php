@@ -335,8 +335,12 @@ function payWithMidtrans(snapToken) {
     }
     snap.pay(snapToken, {
         onSuccess: function(result){
-            Toast.fire({ icon: 'success', title: 'Pembayaran berhasil!' });
-            setTimeout(() => location.reload(), 1500);
+            // Panggil fallback localhost secara manual via AJAX dengan mengirim status yang sudah didapat dari JS Midtrans
+            fetch('{{ route("user.profil") }}?order_id=' + result.order_id + '&transaction_status=' + result.transaction_status)
+                .then(() => {
+                    Toast.fire({ icon: 'success', title: 'Pembayaran berhasil!' });
+                    setTimeout(() => location.reload(), 1500);
+                });
         },
         onPending: function(result){
             Toast.fire({ icon: 'info', title: 'Menunggu pembayaran.' });
